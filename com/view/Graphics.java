@@ -1,4 +1,4 @@
-package com.etu.game.view;
+package com.view;
 
 public interface Graphics {
 

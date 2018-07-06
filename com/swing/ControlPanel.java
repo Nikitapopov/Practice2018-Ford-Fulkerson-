@@ -1,4 +1,4 @@
-package com.etu.game.swing;
+package com.swing;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;

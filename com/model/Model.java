@@ -1,9 +1,9 @@
-package com.etu.game.model;
+package com.model;
 
-import com.etu.game.model.pathfinder.Edge;
-import com.etu.game.model.pathfinder.Node;
-import com.etu.game.model.pathfinder.PathFinder;
-import com.etu.game.model.pathfinder.Point;
+import com.model.pathfinder.Edge;
+import com.model.pathfinder.Node;
+import com.model.pathfinder.PathFinder;
+import com.model.pathfinder.Point;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +15,9 @@ public class Model {
     private Set<Node> nodes;
     private Set<Edge> edges;
     private PathFinder algorithm;
+    private Thread thread = new Thread();
     private static final int CONST = 80;
+    private Node current, finish, start;
 
     public void resetNodesCharCount() {
         Node.resetCount();
@@ -23,6 +25,9 @@ public class Model {
 
     public void generateNewModel(int nodes_number) {
         resetNodesCharCount();
+        if (thread.isAlive()) {
+            closeThread();
+        }
 
         nodes = new HashSet<>();
         edges = new HashSet<>();
@@ -92,10 +97,32 @@ public class Model {
             }
         }
 
-        algorithm = new PathFinder(edges, nodes);
+        createThread();
+        startThread();
+
     }
 
-    public Model(int nodes_number) {
+    private void createThread() {
+        algorithm =  new PathFinder(edges, nodes, 100);
+        current = algorithm.getCurrent();
+        finish = algorithm.getFinish();
+        start = algorithm.getStart();
+        thread = new Thread(algorithm);
+    }
+
+    private void startThread(){
+        thread.start();
+    }
+
+    public void notifyThread(){
+        thread.notify();
+    }
+
+    public void closeThread(){
+        thread.interrupt();
+    }
+
+    public Model(int nodes_number) throws InterruptedException {
         generateNewModel(nodes_number);
     }
 
@@ -128,12 +155,8 @@ public class Model {
         if(!isDoubleInBounds(k1, EPS, -EPS)) y = -k1*(x - x1) + y1;
         else y = -k2*(x - x3) + y3;*/
 
-        if(isDoubleInBounds(x, x0, x1) && isDoubleInBounds(x, x2, x3))
-        {
-
-            return true;/*System.out.println("x = " + x + "(" + x0 + ", " + x1 + ", " + x2 + ", " + x3 + ")");
-            System.out.println("1111Edge {" + edge.getFrom().getCh() + ", " + edge.getTo().getCh() + "} intersect {" +
-                    "{" + node.getCh() + ", " + node2.getCh() + "}");*/
+        if(isDoubleInBounds(x, x0, x1) && isDoubleInBounds(x, x2, x3)) {
+            return true;
         }
 
         return false;
@@ -195,6 +218,18 @@ public class Model {
         return edges;
     }
 
+    public Node getCurrent() {
+        return current;
+    }
+
+    public Node getFinish() {
+        return finish;
+    }
+
+    public Node getStart() {
+        return start;
+    }
+
     // Класс для возврата из функции 2 значений, ну и прост чтоб можно было пары хранить)0)0
     public class Pair<T, U> {
         T t;
@@ -204,5 +239,5 @@ public class Model {
             this.t= t;
             this.u= u;
         }
-    }
+}
 }

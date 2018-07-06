@@ -1,8 +1,8 @@
-package com.etu.game.swing;
+package com.swing;
 
-import com.etu.game.controller.Controller;
-import com.etu.game.model.Model;
-import com.etu.game.view.View;
+import com.controller.Controller;
+import com.model.Model;
+import com.view.View;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,13 +16,16 @@ public class GameLauncher extends JFrame {
     private final Component canvas;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new GameLauncher().setVisible(true));
+        SwingUtilities.invokeLater(() -> {
+            try {
+                new GameLauncher().setVisible(true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    private GameLauncher() throws HeadlessException {
-        private final Component startPanel = new JPanel();
-        startPanel.setPreferredSize(new Dimension(400, 560));
-
+    private GameLauncher() throws HeadlessException, InterruptedException {
         canvas = new JPanel();
         canvas.setPreferredSize(new Dimension(400, 440));
 
@@ -43,13 +46,13 @@ public class GameLauncher extends JFrame {
         initListeners();
     }
 
-    private void initListeners() {
+    private void initListeners() throws InterruptedException {
         Model model;
         model = new Model(new Random().nextInt(8) + 3);
 
         View view = new View();
 
-        view.setGraphics(new SwingGraphicsAdapter(this, canvas.getGraphics()));
+        view.setGraphics(new SwingGraphicsAdapter(canvas.getGraphics()));
 
         Controller controller = new Controller(model, view, controls);
 
@@ -79,6 +82,6 @@ public class GameLauncher extends JFrame {
         });
         timer.setRepeats(true);
         timer.start();
-        timer.setDelay(20);
+        timer.setDelay(100);
     }
 }

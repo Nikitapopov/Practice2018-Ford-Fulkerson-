@@ -1,22 +1,26 @@
-package com.etu.game.model.pathfinder;
+package com.model.pathfinder;
 
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class PathFinder {
+public class PathFinder implements Runnable{
     private Node start, finish, current;
     private Set<Edge> v_edges;
     private Set<Node> v_nodes;
+    private int time;
+    private int global_state = 0;
 
-    public PathFinder(Set<Edge> edges, Set<Node> nodes) {
+    @Override
+    public void run() {
+        find_path();
+    }
+
+    public PathFinder(Set<Edge> edges, Set<Node> nodes, int time) {
         v_edges = edges;
         v_nodes = nodes;
+        this.time = time;
         current = start = find_node('a'); // First node always A
         finish = find_node( (char) (new Random().nextInt(nodes.size() - 1) + 'b') ); // Finish node is random, excluding first one
-
-        print_info();
-        find_path();
     }
 
     private void print_info() {
@@ -34,14 +38,14 @@ public class PathFinder {
         System.out.println("Finish = " + finish);
     }
 
-    private void find_path() {
-        int max_flow_capacity = Integer.MAX_VALUE;
-        start.setMark_flow(max_flow_capacity);
+    public void find_path() {
+        start.setMark_flow(Integer.MAX_VALUE);
         start.setNode_camefrom(null);
         start.setMark(1);
 
         while(true) {
             buildEnlargingChain();
+
             if(current == finish) {
                 changeFlowInChain();
                 clear_visited_marks();
@@ -65,8 +69,7 @@ public class PathFinder {
         }
     }
 
-    private void buildEnlargingChain() {
-        if(current == finish) return;
+    private void findNextUnmarkedNode(){
         for( Edge edge: current.getEdgeSet() ) {
 
             if (     edge.getTo().getMark()   == 0 && edge.getMax() - edge.getFlow() > 0)
@@ -75,23 +78,32 @@ public class PathFinder {
             else if (edge.getFrom().getMark() == 0 && edge.getMax() - edge.getFlow() > 0)
                 changeFlow(edge.getTo(), edge.getFrom(), edge);
         }
+    }
+
+    private void buildEnlargingChain() {
+        if(current == finish) return;
+
+        findNextUnmarkedNode();
+
+        //Thread.sleep(time);
+
         current.setMark(2);
         for( Edge edge: current.getEdgeSet() )
         {
-            if( edge.getTo().getMark() == 1 )
-            {
+            if( edge.getTo().getMark() == 1 ) {
+                edge.getTo().setNode_camefrom(current);
                 current = edge.getTo();
+
                 buildEnlargingChain();
                 if(current == finish) return;
+                current = current.getNode_camefrom();
+            } else if ( edge.getFrom().getMark() == 1 ) {
+                edge.getFrom().setNode_camefrom(current);
+                current = edge.getFrom();
 
-                current = edge.getFrom();
-            } else if ( edge.getFrom().getMark() == 1 )
-            {
-                current = edge.getFrom();
                 buildEnlargingChain();
                 if(current == finish) return;
-
-                current = edge.getTo();
+                current = current.getNode_camefrom();
             }
         }
     }
@@ -108,6 +120,7 @@ public class PathFinder {
             edge.setSogl(false);
             to.setMark_flow(Integer.min(from.getMark_flow(), edge.getFlow()));
         }
+
     }
 
     private Node find_node(char ch) {
@@ -132,5 +145,17 @@ public class PathFinder {
         }
 
         System.out.println("Max flow = " + max_flow);
+    }
+
+    public Node getStart() {
+        return start;
+    }
+
+    public Node getFinish() {
+        return finish;
+    }
+
+    public Node getCurrent() {
+        return current;
     }
 }

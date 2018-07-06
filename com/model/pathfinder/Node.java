@@ -1,4 +1,4 @@
-package com.etu.game.model.pathfinder;
+package com.model.pathfinder;
 
 import java.util.*;
 
