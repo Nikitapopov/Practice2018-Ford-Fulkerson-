@@ -15,26 +15,25 @@ public class Model {
     private Set<Node> nodes;
     private Set<Edge> edges;
     private PathFinder algorithm;
-    private Thread thread = new Thread();
     private static final int CONST = 80;
     private Node current, finish, start;
 
-    public void resetNodesCharCount() {
+    public Model(int nodes_number)  {
+        generateNewModel(nodes_number);
+    }
+
+    private void resetNodesCharCount() {
         Node.resetCount();
     }
 
-    public void generateNewModel(int nodes_number) {
+    synchronized public void generateNewModel(int nodes_number) {
         resetNodesCharCount();
-        if (thread.isAlive()) {
-            closeThread();
-        }
 
         nodes = new HashSet<>();
         edges = new HashSet<>();
         for (int i = 0; i < nodes_number; i++) {
             Node node = new Node(nodes);
-            //System.out.println("New node [" + node.getCh() + "] (" + node.getPosition().getX() + ", " + node.getPosition().getY() + ")");
-            nodes.add(node);
+                nodes.add(node);
         }
 
         for (Node node : nodes) {
@@ -62,11 +61,9 @@ public class Model {
                 {
                     continue;
                 }
-                //System.out.println("Trying to build edge between [" + node2.getCh() + "] and [" + node.getCh() + "]");
 
                 Point T1 = null, T2 = null;
                 boolean isThereAnyPointsBetween = false;
-
 
                 for (Node node3 : nodes) {
                     if (node3 == node2 || node3 == node ) continue;
@@ -80,7 +77,6 @@ public class Model {
 
                     if(isPointInTriangle(O, P, T1, T2)) {
                         isThereAnyPointsBetween = true;
-                        //System.out.println("Point [" + node3.getCh() + "] is in triange between [" + node.getCh() + "] and [" + node2.getCh() + "]");
                         break;
                     }
                 }
@@ -91,39 +87,18 @@ public class Model {
                     node.addEdge(edge);
                     node2.addEdge(edge);
                     edges.add(edge);
-                    //System.out.println("Edge between [" + node2.getCh() + "] and [" + node.getCh() + "] is built");
                 }
 
             }
         }
 
-        createThread();
-        startThread();
-
+        algorithm = new PathFinder(edges, nodes);
+        setSFC();
     }
 
-    private void createThread() {
-        algorithm =  new PathFinder(edges, nodes, 100);
-        current = algorithm.getCurrent();
-        finish = algorithm.getFinish();
-        start = algorithm.getStart();
-        thread = new Thread(algorithm);
-    }
-
-    private void startThread(){
-        thread.start();
-    }
-
-    public void notifyThread(){
-        thread.notify();
-    }
-
-    public void closeThread(){
-        thread.interrupt();
-    }
-
-    public Model(int nodes_number) throws InterruptedException {
-        generateNewModel(nodes_number);
+    public void update() {
+        algorithm.make_step();
+        setSFC();
     }
 
     private boolean checkForIntersect(Edge edge, Node node, Node node2) {
@@ -230,6 +205,16 @@ public class Model {
         return start;
     }
 
+    public void setSFC(){
+        start   = algorithm.getStart();
+        finish  = algorithm.getFinish();
+        current = algorithm.getCurrent();
+    }
+
+    public int getMaxFlow() {
+        return algorithm.getMaxFlow();
+    }
+
     // Класс для возврата из функции 2 значений, ну и прост чтоб можно было пары хранить)0)0
     public class Pair<T, U> {
         T t;
@@ -239,5 +224,10 @@ public class Model {
             this.t= t;
             this.u= u;
         }
-}
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

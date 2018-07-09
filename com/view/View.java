@@ -15,11 +15,11 @@ public class View {
     private Graphics graphics;
 
     public void draw(Model model) {
-        drawHeader(model.getNodes().size());
+        drawHeader(model.getNodes().size(), model.getMaxFlow());
         drawField();
         drawEdges(model.getEdges());
-        drawNodes(model.getNodes());
-        drawSFC(model.getCurrent(), model.getStart(), model.getFinish());
+        drawNodes(model.getNodes(), model.getCurrent(), model.getStart(), model.getFinish());
+        drawNodesPosibleFlow(model.getNodes());
     }
 
     private void drawEdges(Set<Edge> edges) {
@@ -31,47 +31,57 @@ public class View {
             int y1 = position1.getY();
             int x2 = position2.getX();
             int y2 = position2.getY();
-            graphics.drawLine(x1,y1 + HEADER_HEIGHT, x2,y2 + HEADER_HEIGHT,  Color.BLUE.getRGB());
-            graphics.drawText((x1 + x2)/2 - 5, (y1 + y2)/2 + HEADER_HEIGHT, edge.getMax() + "/" + edge.getFlow(), Color.YELLOW.getRGB());
 
+            Color edge_color;
+            if(edge.state == 1) edge_color = Color.EDGE_RED;
+            else if(edge.state == 2) edge_color = Color.EDGE_FULL;
+            else edge_color = Color.EDGE_BLUE;
+
+            graphics.drawLine(x1,y1 + HEADER_HEIGHT, x2,y2 + HEADER_HEIGHT,  edge_color.getRGB());
+            graphics.drawText((x1 + x2)/2 - 5, (y1 + y2)/2 + HEADER_HEIGHT, edge.getMax() + "/" + edge.getFlow(), Color.YELLOW.getRGB());
         }
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-    private void drawHeader(int node_number) {
+    private void drawHeader(int node_number, int max_flow) {
         int height = HEADER_HEIGHT - 2;
-        graphics.drawRect(0, 0, 400, height, Color.HEADER.getRGB());
-        graphics.drawRect(0, height, 400, 2, Color.YELLOW.getRGB());
-        graphics.drawText(20, 25, "Node number = " + node_number, Color.BLUE.getRGB());
+        graphics.drawRect(0, 0, 400, height, Color.WHITE.getRGB());
+        graphics.drawRect(0, height, 400, 2, Color.BLACK.getRGB());
+        StringBuilder sb = new StringBuilder();
+        sb.append("Node number = " + node_number);
+        if(max_flow > 0) sb.append("   Max flow = " + max_flow);
+        graphics.drawText(20, 25, sb.toString(), Color.BLACK.getRGB());
 
     }
 
-    private void drawNodes(Set<Node> nodes) {
+    private void drawNodesPosibleFlow(Set<Node> nodes) {
         for (Node node : nodes) {
             Point position = node.getPosition();
             int x = position.getX() - CELL_SIZE/2;
             int y = position.getY() - CELL_SIZE/2;
-            graphics.drawOval(x, y + HEADER_HEIGHT, CELL_SIZE , CELL_SIZE, Color.NODE.getRGB());
-            graphics.drawText(x, y + HEADER_HEIGHT, String.valueOf(node.getCh()).toUpperCase(), Color.RED.getRGB());
+            graphics.drawText(x + CELL_SIZE/3, y + HEADER_HEIGHT + CELL_SIZE/3*2, String.valueOf(node.getMark_flow()), Color.EDGE_RED.getRGB());
         }
     }
 
-    private void drawSFC(Node current, Node start, Node finish){
-        Point position = start.getPosition();
-        int x = position.getX() - CELL_SIZE/2;
-        int y = position.getY() - CELL_SIZE/2;
-        graphics.drawOval(x, y + HEADER_HEIGHT, CELL_SIZE , CELL_SIZE, Color.START_AND_FINISH.getRGB());
-        position = finish.getPosition();
-        x = position.getX() - CELL_SIZE/2;
-        y = position.getY() - CELL_SIZE/2;
-        graphics.drawOval(x, y + HEADER_HEIGHT, CELL_SIZE , CELL_SIZE, Color.START_AND_FINISH.getRGB());
+    private void drawNodes(Set<Node> nodes, Node current, Node start, Node finish) {
+        for (Node node : nodes) {
+            Point position = node.getPosition();
+            int x = position.getX() - CELL_SIZE/2;
+            int y = position.getY() - CELL_SIZE/2;
+            Color node_color;
 
-        position = current.getPosition();
-        x = position.getX() - CELL_SIZE/2;
-        y = position.getY() - CELL_SIZE/2;
-        graphics.drawOval(x, y + HEADER_HEIGHT, CELL_SIZE , CELL_SIZE, Color.CURRENT.getRGB());
+            if(node.equals(finish)) node_color = Color.NODE_FINISH;
+            else if(node.equals(start)) node_color = Color.NODE_START;
+            else if(node.getMark() == 1) node_color = Color.NODE_VIEWED;
+            else if(node.getMark() == 2) node_color = Color.NODE_DONE;
+            else node_color = Color.NODE;
+
+            if(node.equals(current))
+                graphics.drawOval(x - 3, y + HEADER_HEIGHT - 3, CELL_SIZE + 6, CELL_SIZE + 6, Color.WHITE.getRGB());
+            graphics.drawOval(x, y + HEADER_HEIGHT, CELL_SIZE , CELL_SIZE, node_color.getRGB());
+            graphics.drawText(x, y + HEADER_HEIGHT, String.valueOf(node.getCh()).toUpperCase() + node.getMark(), Color.EDGE_RED.getRGB());
+        }
     }
-
 
     private void drawField() {
         graphics.drawRect(0, HEADER_HEIGHT, 400, 400, Color.BLACK.getRGB());
@@ -82,14 +92,17 @@ public class View {
     }
 
     private enum Color {
-        BLUE(new java.awt.Color(14, 36, 162).getRGB()),
-        RED(new java.awt.Color(255, 0, 0).getRGB()),
-        HEADER(new java.awt.Color(169, 180, 192).getRGB()),
-        BLACK(new java.awt.Color(0, 0, 0).getRGB()),
-        NODE(new java.awt.Color(107, 255, 248).getRGB()),
-        YELLOW(new java.awt.Color(255, 227, 0).getRGB()),
-        START_AND_FINISH(new java.awt.Color(0, 255, 163).getRGB()),
-        CURRENT(new java.awt.Color(0, 255, 0).getRGB());
+        EDGE_BLUE(new java.awt.Color(106, 20, 47).getRGB()),
+        EDGE_FULL(new java.awt.Color(175, 0, 255).getRGB()),
+        EDGE_RED(new java.awt.Color(106, 111, 27).getRGB()),
+        WHITE(new java.awt.Color(174, 184, 171).getRGB()),
+        BLACK(new java.awt.Color(43, 38, 37).getRGB()),
+        NODE(new java.awt.Color(255, 218, 135).getRGB()),
+        YELLOW(new java.awt.Color(140, 171, 110).getRGB()),
+        NODE_START(new java.awt.Color(42, 255, 39).getRGB()),
+        NODE_FINISH(new java.awt.Color(183, 0, 2).getRGB()),
+        NODE_DONE(new java.awt.Color(66, 150, 143).getRGB()),
+        NODE_VIEWED(new java.awt.Color(83, 195, 188).getRGB());
 
         private final int rgb;
 

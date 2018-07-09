@@ -7,7 +7,7 @@ public class Edge {
     private Point T1, T2;
     private int flow, max;
     private boolean sogl;
-
+    public int state = 0;
 
     public Edge(Node from, Node to) {
         this.from = from;

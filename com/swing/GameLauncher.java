@@ -15,17 +15,11 @@ public class GameLauncher extends JFrame {
     private final ControlPanel controls;
     private final Component canvas;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new GameLauncher().setVisible(true);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+    public static void main(String[] args) { SwingUtilities.invokeLater(() -> { new StartMenu(new GameLauncher() ); });
     }
 
-    private GameLauncher() throws HeadlessException, InterruptedException {
+    private GameLauncher() throws HeadlessException {
+
         canvas = new JPanel();
         canvas.setPreferredSize(new Dimension(400, 440));
 
@@ -46,7 +40,7 @@ public class GameLauncher extends JFrame {
         initListeners();
     }
 
-    private void initListeners() throws InterruptedException {
+    private void initListeners() {
         Model model;
         model = new Model(new Random().nextInt(8) + 3);
 
@@ -58,7 +52,7 @@ public class GameLauncher extends JFrame {
 
         controls.addGenerateButtonListener(e -> controller.generateModel());
         controls.addBSCButtonListener(e -> controller.bscModel());
-        controls.addAtFirstButtonListener(e -> controller.atFirstModel());
+        controls.addAtFirstButtonListener(e -> controller.bscSetToBegin());
 
         canvas.addKeyListener(new KeyAdapter() {
             @Override
@@ -71,17 +65,16 @@ public class GameLauncher extends JFrame {
                         controller.bscModel();
                         break;
                     case KeyEvent.VK_R:
-                        controller.atFirstModel();
+                        controller.bscSetToBegin();
                 }
             }
         });
 
-        Timer timer = new Timer(100, e -> {
-            controller.viewUpdated();
+        Timer timer = new Timer(20, e -> {
+            controller.updateView();
             canvas.requestFocus();
         });
         timer.setRepeats(true);
         timer.start();
-        timer.setDelay(100);
     }
 }

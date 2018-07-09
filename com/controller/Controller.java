@@ -10,27 +10,38 @@ public class Controller {
 
     private final ControlPanel controls;
     private final View view;
-    private Model model;
+    private Model model, modelAtTheBeginning;
+    private int framesCount = 0;
+    private final int FRAME_TICK = 20;
 
     public Controller(Model model, View view, ControlPanel controls) {
         this.model = model;
         this.view = view;
         this.controls = controls;
+        model.update();
     }
 
-    public void viewUpdated() {
+    public void updateView() {
         view.draw(model);
+
+        if(controls.getBSCState() == 1)
+            if(controls.getSlider().getValue()/FRAME_TICK <= framesCount) {
+                model.update();
+                framesCount = 0;
+            } else framesCount++;
     }
 
     public void generateModel(){
-        controls.setBsc(-1);
-        model.generateNewModel(new Random().nextInt(5) + 3);
+        bscSetToBegin();
+        framesCount = 0;
+        model.generateNewModel(new Random().nextInt(5) + 4);
     }
     public void bscModel(){
-        controls.setBsc(controls.getState());
+        controls.setBscState(controls.getBSCState());
     }
 
-    public void atFirstModel(){
-        controls.setBsc(-1);
+    public void bscSetToBegin(){
+        controls.setBscState(-1);
     }
+
 }

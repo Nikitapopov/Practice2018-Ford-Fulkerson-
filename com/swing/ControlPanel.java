@@ -1,6 +1,7 @@
 package com.swing;
 
 import javax.swing.*;
+import javax.swing.event.AncestorListener;
 import java.awt.event.ActionListener;
 
 public class ControlPanel extends JPanel {
@@ -8,7 +9,7 @@ public class ControlPanel extends JPanel {
     private final JButton generate  = createButton("generate", 50, 10);
     private final JButton atFirst   = createButton("restart", 150, 10);
     private JButton bsc             = createButton("begin", 250, 10);
-    private final JSlider slider    = createSlider(0, 10, 50, 80);
+    private final JSlider slider    = createSlider(0, 1000, 50, 80);
     private int state = 0;
 
     public ControlPanel() {
@@ -19,7 +20,7 @@ public class ControlPanel extends JPanel {
         add(slider);
     }
 
-    public void setBsc(int value) {
+    public void setBscState(int value) {
         switch (value){
             case  -1:
                 state = 0;
@@ -37,7 +38,7 @@ public class ControlPanel extends JPanel {
         }
     }
 
-    public int getState() {
+    public int getBSCState() {
         return state;
     }
 
@@ -53,6 +54,10 @@ public class ControlPanel extends JPanel {
         atFirst.addActionListener(listener);
     }
 
+    public void addSliderListener(AncestorListener listener) {
+        slider.addAncestorListener(listener);
+    }
+
     private JButton createButton(String text, int x, int y) {
         JButton left = new JButton(text);
         left.setBounds(x, y, 90, 30);
@@ -65,7 +70,12 @@ public class ControlPanel extends JPanel {
         JSlider slider = new JSlider(min, max);
         slider.setBounds(x, y, 300, 30);
         slider.setPaintLabels(true);
-        slider.setMajorTickSpacing(1);
+        slider.setMajorTickSpacing(250);
+        slider.setValue(Integer.min(max, min + 100));
+        return slider;
+    }
+
+    public JSlider getSlider() {
         return slider;
     }
 }
