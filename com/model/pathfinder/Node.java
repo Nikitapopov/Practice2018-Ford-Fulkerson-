@@ -40,12 +40,13 @@ public class Node {
     }
 
     private boolean isThereOtherNodesNear(Set<Node> nodes, int xn, int yn) {
+
         for (Node node : nodes) {
             Point position = node.getPosition();
             int x = position.getX();
             int y = position.getY();
             if (Math.sqrt(Math.pow(x - xn, 2) + Math.pow(y - yn, 2)) < 70) return true;
-        }
+
         return false;
     }
 
@@ -63,6 +64,7 @@ public class Node {
 
     public void addEdge(Edge edge) { edges.add(edge); }
 
+
     public int getMark() {
             return mark;
     }
@@ -74,6 +76,7 @@ public class Node {
     Set<Edge> getEdgeSet() { return edges; }
 
     Node getNode_camefrom() {
+
         return node_camefrom;
     }
 
@@ -101,5 +104,6 @@ public class Node {
         node_camefrom = null;
         edge_camefrom = null;
         mark_flow = 0;
+
     }
 }

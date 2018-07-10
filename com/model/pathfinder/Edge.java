@@ -35,7 +35,7 @@ public class Edge {
     public Node getTo() {
         return to;
     }
-
+  
     public int getFlow() {
         return flow;
     }

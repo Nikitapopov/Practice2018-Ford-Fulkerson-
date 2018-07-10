@@ -29,7 +29,6 @@ public class Model {
     public void rewindState(){
         algorithm.rewindState();
     }
-
     synchronized public void generateNewModel(int nodes_number) {
         resetNodesCharCount();
 
@@ -87,6 +86,7 @@ public class Model {
 
                 if(!isThereAnyPointsBetween){
                     Edge edge = new Edge(node, node2);
+
                     node.addEdge(edge);
                     node2.addEdge(edge);
                     edges.add(edge);
@@ -130,7 +130,6 @@ public class Model {
         double x = (k1*x0 - y0 - k2*x2 + y2)/(k1 - k2);
 
         return isDoubleInBounds(x, x0, x1) && isDoubleInBounds(x, x2, x3);
-
     }
 
     // if value принадлежит (bound1, bound2) или (bound2, bound1)

@@ -10,7 +10,7 @@ public class Controller {
 
     private final ControlPanel controls;
     private final View view;
-    private Model model;
+    private Model model, modelAtTheBeginning;
     private int framesCount = 0;
     private final int FRAME_TICK = 20;
 
@@ -34,6 +34,7 @@ public class Controller {
     public void generateModel(){
         bscSetToBegin();
         framesCount = 0;
+
         model.generateNewModel(new Random().nextInt(8) + 5);
     }
     public void bscModel(){

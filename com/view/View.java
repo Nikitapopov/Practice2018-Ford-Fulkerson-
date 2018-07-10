@@ -20,6 +20,7 @@ public class View {
         drawEdges(model.getEdges());
         drawNodes(model.getNodes(), model.getCurrent(), model.getStart(), model.getFinish());
         drawNodesPossibleFlow(model.getNodes());
+
     }
 
     private void drawEdges(Set<Edge> edges) {
