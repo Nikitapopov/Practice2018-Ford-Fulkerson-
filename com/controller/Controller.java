@@ -34,7 +34,8 @@ public class Controller {
     public void generateModel(){
         bscSetToBegin();
         framesCount = 0;
-        model.generateNewModel(new Random().nextInt(5) + 4);
+
+        model.generateNewModel(new Random().nextInt(8) + 5);
     }
     public void bscModel(){
         controls.setBscState(controls.getBSCState());
@@ -44,4 +45,7 @@ public class Controller {
         controls.setBscState(-1);
     }
 
+    public void resetModel() {
+        model.rewindState();
+    }
 }

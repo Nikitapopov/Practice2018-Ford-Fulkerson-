@@ -16,12 +16,29 @@ public class PathFinder {
         finish = find_node( (char) (new Random().nextInt(nodes.size() - 1) + 'b') ); // Finish node is random, excluding first one
     }
 
+    public void rewindState() {
+        for(Edge edge : v_edges){
+            edge.resetEdge();
+        }
+        for(Node node : v_nodes){
+            node.resetNode();
+        }
+
+        clear_visited_marks();
+
+        start.setMark_flow(20);
+        current = start;
+        max_flow = 0;
+        state = 0;
+    }
+
     private void checkForFullEdges(){
         for(Edge edge : v_edges)
             if(edge.getFlow() - edge.getMax() == 0) edge.state = 2;
     }
 
-    public void make_step() {
+    public void make_step()
+    {
         checkForFullEdges();
 
         switch (state)
@@ -66,13 +83,9 @@ public class PathFinder {
                 }
 
                 current.getNode_camefrom().setMark_flow(current.getMark_flow());
-
-                if(current.getEdge_camefrom().getSogl())
-                    current.getEdge_camefrom().changeFlow(current.getMark_flow());
-                else
-                    current.getEdge_camefrom().changeFlow(-current.getMark_flow());
-
+                current.getEdge_camefrom().changeFlow(current.getMark_flow());
                 current = current.getNode_camefrom();
+
             case 3:
                 break;
         }
@@ -94,13 +107,8 @@ public class PathFinder {
         to.setNode_camefrom(from);
         to.setEdge_camefrom(edge);
 
-        if (edge.getMax() > edge.getFlow()) {
-            edge.setSogl(true);
+        if (edge.getMax() > edge.getFlow())
             to.setMark_flow(Integer.min(from.getMark_flow(), edge.getMax() - edge.getFlow()));
-        } else {
-            edge.setSogl(false);
-            to.setMark_flow(Integer.min(from.getMark_flow(), edge.getFlow()));
-        }
     }
 
     private Node find_node(char ch) {

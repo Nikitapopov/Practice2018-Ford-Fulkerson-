@@ -26,6 +26,9 @@ public class Model {
         Node.resetCount();
     }
 
+    public void rewindState(){
+        algorithm.rewindState();
+    }
     synchronized public void generateNewModel(int nodes_number) {
         resetNodesCharCount();
 
@@ -62,7 +65,7 @@ public class Model {
                     continue;
                 }
 
-                Point T1 = null, T2 = null;
+                Point T1, T2;
                 boolean isThereAnyPointsBetween = false;
 
                 for (Node node3 : nodes) {
@@ -83,7 +86,7 @@ public class Model {
 
                 if(!isThereAnyPointsBetween){
                     Edge edge = new Edge(node, node2);
-                    edge.setT1T2(T1, T2);
+
                     node.addEdge(edge);
                     node2.addEdge(edge);
                     edges.add(edge);
@@ -102,7 +105,6 @@ public class Model {
     }
 
     private boolean checkForIntersect(Edge edge, Node node, Node node2) {
-        // TODO никаких проверок на корректность вычислений нет )))
         if(node == edge.getFrom() || node == edge.getTo() || node2 == edge.getFrom() || node2 == edge.getTo()) return false;
         /*
               (y1 - y0)
@@ -126,15 +128,8 @@ public class Model {
         double k1 = (double)(y1 - y0)/(double)(x1 - x0);
         double k2 = (double)(y3 - y2)/(double)(x3 - x2);
         double x = (k1*x0 - y0 - k2*x2 + y2)/(k1 - k2);
-       /* double y;
-        if(!isDoubleInBounds(k1, EPS, -EPS)) y = -k1*(x - x1) + y1;
-        else y = -k2*(x - x3) + y3;*/
 
-        if(isDoubleInBounds(x, x0, x1) && isDoubleInBounds(x, x2, x3)) {
-            return true;
-        }
-
-        return false;
+        return isDoubleInBounds(x, x0, x1) && isDoubleInBounds(x, x2, x3);
     }
 
     // if value принадлежит (bound1, bound2) или (bound2, bound1)
@@ -205,7 +200,7 @@ public class Model {
         return start;
     }
 
-    public void setSFC(){
+    private void setSFC(){
         start   = algorithm.getStart();
         finish  = algorithm.getFinish();
         current = algorithm.getCurrent();
@@ -224,10 +219,5 @@ public class Model {
             this.t= t;
             this.u= u;
         }
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 }

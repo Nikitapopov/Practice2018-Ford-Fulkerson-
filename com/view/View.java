@@ -19,7 +19,8 @@ public class View {
         drawField();
         drawEdges(model.getEdges());
         drawNodes(model.getNodes(), model.getCurrent(), model.getStart(), model.getFinish());
-        drawNodesPosibleFlow(model.getNodes());
+        drawNodesPossibleFlow(model.getNodes());
+
     }
 
     private void drawEdges(Set<Edge> edges) {
@@ -54,12 +55,15 @@ public class View {
 
     }
 
-    private void drawNodesPosibleFlow(Set<Node> nodes) {
+    private void drawNodesPossibleFlow(Set<Node> nodes) {
         for (Node node : nodes) {
             Point position = node.getPosition();
             int x = position.getX() - CELL_SIZE/2;
-            int y = position.getY() - CELL_SIZE/2;
-            graphics.drawText(x + CELL_SIZE/3, y + HEADER_HEIGHT + CELL_SIZE/3*2, String.valueOf(node.getMark_flow()), Color.EDGE_RED.getRGB());
+            int y = position.getY() - CELL_SIZE/2 + 14 + HEADER_HEIGHT;
+
+            if(node.getMark_flow() > 9) x += 3; else x += 7;
+
+            graphics.drawText(x, y, String.valueOf(node.getMark_flow()), Color.EDGE_RED.getRGB());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.model.pathfinder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Node {
     private static int count = 0;
@@ -22,22 +23,13 @@ public class Node {
         int xn = new Random().nextInt(BOUND) + INDENT;
         int yn = new Random().nextInt(BOUND) + INDENT;
 
-        while(isThereOtherNodesNear(nodes, xn, yn, 70))
+        while(isThereOtherNodesNear(nodes, xn, yn))
         {
             xn = new Random().nextInt(BOUND) + INDENT;
             yn = new Random().nextInt(BOUND) + INDENT;
         }
 
         position = new Point(xn, yn);
-    }
-
-    public Node(char ch) {
-        this.ch = ch;
-        mark = 0;
-        mark_flow = 0;
-        node_camefrom = null;
-        edge_camefrom = null;
-        edges = new HashSet<>();
     }
 
     @Override
@@ -47,14 +39,13 @@ public class Node {
                 '}';
     }
 
-    private boolean isThereOtherNodesNear(Set<Node> nodes, int xn, int yn, int r)
-    {
+    private boolean isThereOtherNodesNear(Set<Node> nodes, int xn, int yn) {
+
         for (Node node : nodes) {
             Point position = node.getPosition();
             int x = position.getX();
             int y = position.getY();
-            if (Math.sqrt(Math.pow(x - xn, 2) + Math.pow(y - yn, 2)) < r) return true;
-        }
+            if (Math.sqrt(Math.pow(x - xn, 2) + Math.pow(y - yn, 2)) < 70) return true;
 
         return false;
     }
@@ -71,23 +62,21 @@ public class Node {
         count = 0;
     }
 
-    public void addEdge(Edge edge) {
-        edges.add(edge);
-    }
+    public void addEdge(Edge edge) { edges.add(edge); }
+
 
     public int getMark() {
             return mark;
     }
 
-    public void setMark(int i) {
+    void setMark(int i) {
         mark = (char)i;
     }
 
-    public Set<Edge> getEdgeSet() {
-        return edges;
-    }
+    Set<Edge> getEdgeSet() { return edges; }
 
-    public Node getNode_camefrom() {
+    Node getNode_camefrom() {
+
         return node_camefrom;
     }
 
@@ -95,23 +84,26 @@ public class Node {
         return mark_flow;
     }
 
-    public void setMark_flow(int mark_flow) {
+    void setMark_flow(int mark_flow) {
         this.mark_flow = mark_flow;
     }
 
-    public Edge getEdge_camefrom() {
+    Edge getEdge_camefrom() {
         return edge_camefrom;
     }
 
-    public void setNode_camefrom(Node o) {
+    void setNode_camefrom(Node o) {
         node_camefrom = o;
     }
 
-    public void changeFlow(int mark_flow) {
-        this.mark_flow += mark_flow;
+    void setEdge_camefrom(Edge edge) {
+        edge_camefrom = edge;
     }
 
-    public void setEdge_camefrom(Edge edge) {
-        edge_camefrom = edge;
+    void resetNode() {
+        node_camefrom = null;
+        edge_camefrom = null;
+        mark_flow = 0;
+
     }
 }

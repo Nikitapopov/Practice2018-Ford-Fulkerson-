@@ -53,6 +53,8 @@ public class GameLauncher extends JFrame {
         controls.addGenerateButtonListener(e -> controller.generateModel());
         controls.addBSCButtonListener(e -> controller.bscModel());
         controls.addAtFirstButtonListener(e -> controller.bscSetToBegin());
+        controls.addAtFirstButtonListener(e -> controller.resetModel());
+
 
         canvas.addKeyListener(new KeyAdapter() {
             @Override

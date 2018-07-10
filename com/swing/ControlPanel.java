@@ -54,10 +54,6 @@ public class ControlPanel extends JPanel {
         atFirst.addActionListener(listener);
     }
 
-    public void addSliderListener(AncestorListener listener) {
-        slider.addAncestorListener(listener);
-    }
-
     private JButton createButton(String text, int x, int y) {
         JButton left = new JButton(text);
         left.setBounds(x, y, 90, 30);
